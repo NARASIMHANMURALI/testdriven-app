@@ -115,14 +115,48 @@ class TestUserService(BaseTestCase):
             self.assertIn('michael@realpython.com', data['data']['email'])
             self.assertIn('success', data['status'])
 
-def test_single_user_incorrect_id(self):
-    """Ensure error is thrown if the id does not exist."""
-    with self.client:
-        response = self.client.get('/users/999')
-        data = json.loads(response.data.decode())
-        self.assertEqual(response.status_code, 404)
-        self.assertIn('User does not exist', data['message'])
-        self.assertIn('fail', data['status'])
+    def test_single_user_incorrect_id(self):
+        """Ensure error is thrown if the id does not exist."""
+        with self.client:
+            response = self.client.get('/users/999')
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 404)
+            self.assertIn('User does not exist', data['message'])
+            self.assertIn('fail', data['status'])
+
+    def test_main_no_users(self):
+        """Ensure the main route behaves correctly when no users have been
+        added to the database."""
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'<h1>All Users</h1>', response.data)
+        self.assertIn(b'<p>No users!</p>', response.data)
+
+    def test_main_with_users(self):
+        """Ensure the main route behaves correctly when users have been
+        added to the database."""
+        add_user('michael', 'michael@realpython.com')
+        add_user('fletcher', 'fletcher@realpython.com')
+        with self.client:
+            response = self.client.get('/')
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b'<h1>All Users</h1>', response.data)
+            self.assertNotIn(b'<p>No users!</p>', response.data)
+            self.assertIn(b'michael', response.data)
+            self.assertIn(b'fletcher', response.data)
+
+    def test_main_add_user(self):
+        """Ensure a new user can be added to the database."""
+        with self.client:
+            response = self.client.post(
+                '/',
+                data=dict(username='michael', email='michael@realpython.com'),
+                follow_redirects=True
+            )
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b'<h1>All Users</h1>', response.data)
+            self.assertNotIn(b'<p>No users!</p>', response.data)
+            self.assertIn(b'michael', response.data)
 
 
 if __name__ == '__main__':

@@ -1,5 +1,15 @@
 version: '3.3'
 services:
+  nginx:
+    container_name: nginx
+    build: ./nginx/
+    restart: always
+    ports:
+      - 80:80
+    depends_on:
+      - users-service
+    links:
+      - users-service
   users-service:
     container_name: users-service
     build:
