@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.4'
 services:
   nginx:
     container_name: nginx
@@ -19,7 +19,7 @@ services:
       context: ./services/users-service
       dockerfile: Dockerfile-dev
     volumes:
-      - './users-service:/usr/src/app'
+      - './services/users-service:/usr/src/app'
     ports:
       - 5001:5000
     environment:
