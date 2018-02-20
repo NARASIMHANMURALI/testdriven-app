@@ -16,7 +16,7 @@ services:
   users-service:
     container_name: users-service
     build:
-      context: ./users-service
+      context: ./services/users-service
       dockerfile: Dockerfile-dev
     volumes:
       - './users-service:/usr/src/app'
@@ -33,7 +33,7 @@ services:
   users-db:
     container_name: users-db
     build:
-      context: ./users-service/project/db
+      context: ./services/users-service/project/db
       dockerfile: Dockerfile
     ports:
       - 5435:5432
